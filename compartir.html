@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Comparte tu foto 📸</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+:root{
+  --rosa:#c2185b;
+  --rosa-claro:#ffe6ef;
+  --vino:#8e0038;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#fff0f6,#fde2ec);
+  font-family:'Georgia', serif;
+}
+
+.card{
+  background:white;
+  padding:35px 30px;
+  border-radius:25px;
+  width:100%;
+  max-width:360px;
+  box-shadow:0 20px 40px rgba(0,0,0,.15);
+  text-align:center;
+  animation:fadeIn 1s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0; transform:translateY(30px)}
+  to{opacity:1; transform:translateY(0)}
+}
+
+h2{
+  color:var(--vino);
+  margin-bottom:10px;
+}
+
+p{
+  color:#666;
+  font-size:14px;
+  margin-bottom:20px;
+}
+
+input[type="text"],
+input[type="file"]{
+  width:100%;
+  padding:12px;
+  margin:10px 0;
+  border-radius:12px;
+  border:1px solid #ddd;
+  font-size:14px;
+}
+
+input[type="file"]{
+  background:var(--rosa-claro);
+}
+
+.upload-btn{
+  margin-top:15px;
+  width:100%;
+  padding:14px;
+  font-size:16px;
+  font-weight:bold;
+  color:white;
+  background:linear-gradient(135deg,var(--rosa),var(--vino));
+  border:none;
+  border-radius:50px;
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+  box-shadow:0 10px 20px rgba(194,24,91,.4);
+  transition:transform .2s, box-shadow .2s;
+}
+
+.upload-btn::after{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-100%;
+  width:100%;
+  height:100%;
+  background:rgba(255,255,255,.3);
+  transform:skewX(-20deg);
+}
+
+.upload-btn:hover::after{
+  left:200%;
+  transition:all .7s ease;
+}
+
+.upload-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 15px 30px rgba(194,24,91,.6);
+}
+
+.upload-btn:active{
+  transform:scale(.97);
+}
+
+#msg{
+  margin-top:15px;
+  font-size:14px;
+  min-height:20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h2>Comparte tu recuerdo 💕</h2>
+  <p>Sube la foto de tu libro 📖👌</p>
+
+  <input type="text" id="name" placeholder="Tu nombre">
+  <input type="file" id="photo" accept="image/*">
+
+  <button class="upload-btn" onclick="uploadPhoto()">
+    📤 Subir foto
+  </button>
+
+  <div id="msg"></div>
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwuR0x7nlTsTX4qt18iPw0hYRm-gsto_TKBY8T6GF9UoSoHKxUPpr4Tu4vvKhQL-YNwlQ/exec";
+
+function uploadPhoto(){
+  const name = document.getElementById("name").value.trim();
+  const file = document.getElementById("photo").files[0];
+  const msg = document.getElementById("msg");
+
+  if(!name || !file){
+    msg.innerHTML = "⚠️ Escribe tu nombre y selecciona una foto";
+    msg.style.color = "#b00020";
+    return;
+  }
+
+  msg.innerHTML = "⏳ Subiendo foto...";
+  msg.style.color = "#444";
+
+  const reader = new FileReader();
+  reader.onload = function(){
+    fetch(SCRIPT_URL,{
+      method:"POST",
+      body:JSON.stringify({
+        name: name + "_" + Date.now() + "." + file.name.split(".").pop(),
+        file: reader.result
+      })
+    })
+    .then(res => res.json())
+    .then(() => {
+      msg.innerHTML = "✅ ¡Foto subida con éxito! Gracias 💖";
+      msg.style.color = "#2e7d32";
+      document.getElementById("name").value = "";
+      document.getElementById("photo").value = "";
+    })
+    .catch(()=>{
+      msg.innerHTML = "❌ Error al subir la foto";
+      msg.style.color = "#b00020";
+    });
+  };
+
+  reader.readAsDataURL(file);
+}
+</script>
+
+</body>
+</html>

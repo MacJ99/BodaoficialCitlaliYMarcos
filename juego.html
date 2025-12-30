@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Mini Juego</title>
+<style>
+  :root{ --bg:#fff4f9; --panel:#ffe6f0; --accent:#d6336c; --text:#222; }
+  body{ margin:0; font-family:system-ui,Segoe UI,Roboto,Arial; background:var(--bg); display:flex; flex-direction:column; align-items:center; }
+  header{ text-align:center; padding:16px 10px; } h1{ color:var(--accent); margin:0 0 6px } .sub{ color:#555; margin:0 }
+  #wrap{ width:95vw; max-width:900px; background:var(--panel); border:2px solid var(--accent); border-radius:16px; padding:10px; box-shadow:0 10px 30px rgba(214,51,108,.15); }
+  canvas{ width:100%; height:auto; display:block; border-radius:12px; background:#ffeef5 }
+
+  /* 👇 CORRECCIÓN PARA MÓVILES (AGREGADO) */
+  @media(max-width:1000px){
+    canvas{
+      height:45vh !important;
+    }
+  }
+
+  .hud{ display:flex; justify-content:space-between; color:#444; padding:6px 8px; font-weight:700 }
+  .controls{ display:flex; gap:12px; justify-content:center; padding:10px; flex-wrap:wrap; }
+  .btn{ background:var(--accent); color:#fff; border:none; border-radius:999px; padding:14px 20px; font-weight:800; letter-spacing:.3px; box-shadow:0 8px 16px rgba(214,51,108,.25); touch-action:manipulation; user-select:none; cursor:pointer; }
+  .btn:active{ filter:brightness(.95) }
+  .hint{ text-align:center; color:#666; font-size:.95rem; padding-bottom:10px }
+  .gameover{ position:absolute; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.25); border-radius:12px; }
+  .card{ background:#fff; color:#222; border-radius:12px; padding:16px; text-align:center; width:min(420px,90%); box-shadow:0 12px 30px rgba(0,0,0,.25); }
+  .card h2{ margin:6px 0 10px; color:var(--accent) } .card p{ margin:8px 0 }
+  .card .actions{ display:flex; gap:10px; justify-content:center; margin-top:10px }
+  .card .actions .btn{ background:#7c3aed }
+</style>
+</head>
+<body>
+<header>
+  <h1>💍 Carrera contra obstaculos</h1>
+  <p class="sub">Salta para esquivar las posibles causas que perjudican el matrimonio.</p>
+</header>
+
+<div id="wrap">
+
+  <!-- ⭐ AGREGO EL RÉCORD EN LA HUD (NO MODIFICO TUS LÍNEAS) -->
+  <div class="hud">
+    <div>Puntos: <span id="score">0</span></div>
+    <div>Velocidad: <span id="speed">1.0x</span></div>
+    <div>Récord: <span id="highScore">0</span></div>
+  </div>
+
+  <div style="position:relative">
+    <canvas id="game" width="1000" height="240"></canvas>
+    <div id="overlay" class="gameover">
+      <div class="card">
+        <h2>💔 Game Over</h2>
+        <p>Puntuación: <span id="finalScore">0</span></p>
+
+        <!-- ⭐ Aquí también puedo agregar el récord si tú quieres -->
+        <p id="recordText" style="font-weight:bold;color:#7c3aed;"></p>
+
+        <div class="actions">
+          <button class="btn" id="restartBtn">Reiniciar (Enter)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="controls">
+    <button class="btn" id="jumpBtn">Saltar (Espacio/↑)</button>
+    <button class="btn" id="duckBtn">Agacharse (↓)</button>
+  </div>
+  <p class="hint">Consejo: en celular usa los botones. En teclado: Espacio/↑ salta, ↓ agacha.</p>
+</div>
+
+<script>
+(function(){
+
+  /* ⭐⭐⭐ AGREGO VARIABLES DEL RÉCORD ⭐⭐⭐ */
+
+  let highScore = Number(localStorage.getItem("highScore") || 0);
+  const highScoreEl = document.getElementById("highScore");
+  highScoreEl.textContent = highScore;
+
+  const recordText = document.getElementById("recordText");
+
+  /* -------------------------------------------------------- */
+
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+  const scoreEl = document.getElementById('score');
+  const speedEl = document.getElementById('speed');
+  const overlay = document.getElementById('overlay');
+  const finalScoreEl = document.getElementById('finalScore');
+  const jumpBtn = document.getElementById('jumpBtn');
+  const duckBtn = document.getElementById('duckBtn');
+  const restartBtn = document.getElementById('restartBtn');
+
+  function fitCanvas(){
+    const rect = canvas.getBoundingClientRect();
+    let scale = rect.width / canvas.width;
+    if(scale < 1) scale = 1;
+    ctx.setTransform(scale,0,0,scale,0,0);
+  }
+
+  window.addEventListener('resize', fitCanvas);
+  fitCanvas();
+
+  const groundY = 190;
+  let speed = 6;
+  let score = 0;
+  let gameOver = false;
+  let t = 0;
+
+  const gravity = 0.5;
+  const jumpV = -10;
+  const maxFall = 10;
+  const jumpCooldownMs = 200;
+
+  const coyoteMs = 120;
+  const bufferMs = 150;
+  let lastOnGroundTime = 0;
+  let lastJumpPressTime = -Infinity;
+
+  const player = {
+    x: 80, y: groundY, w: 70, h: 60, vy: 0,
+    jumping: false, ducking: false, lastJump: 0,
+    update(dt, now){
+      this.vy += gravity;
+      if(this.vy > maxFall) this.vy = maxFall;
+      this.y += this.vy;
+
+      const onGround = this.y >= groundY + (this.ducking ? 8 : 0);
+      if(onGround){
+        this.y = groundY + (this.ducking ? 8 : 0);
+        this.vy = 0; this.jumping = false;
+        lastOnGroundTime = now;
+
+        if(now - lastJumpPressTime <= bufferMs){
+          this.jump(now);
+          lastJumpPressTime = -Infinity;
+        }
+      }
+      this.draw();
+    },
+    canJump(now){
+      const onGround = !this.jumping && this.vy === 0;
+      const hasCoyote = (now - lastOnGroundTime) <= coyoteMs;
+      const cooldownOk = (now - this.lastJump) >= jumpCooldownMs;
+      return cooldownOk && (onGround || hasCoyote);
+    },
+    jump(now){
+      if(!this.canJump(now)) return;
+      this.vy = jumpV;
+      this.jumping = true;
+      this.lastJump = now;
+    },
+    setDuck(d){ this.ducking = d; },
+    draw(){
+      const x = this.x, y = this.y;
+      ctx.save();
+      const bob = Math.sin(t*0.15)*1.5;
+      ctx.translate(0, bob);
+
+      ctx.fillStyle = 'rgba(0,0,0,0.15)';
+      ctx.beginPath(); ctx.ellipse(x+30, groundY+18, 28, 6, 0, 0, Math.PI*2); ctx.fill();
+
+      drawPerson(x+38, y-40, '#1f2937', '#0ea5e9', false, this.ducking);
+      drawPerson(x+10, y-40, '#ef4444', '#ffffff', true, this.ducking);
+
+      ctx.font = '20px Segoe UI Emoji, Apple Color Emoji, sans-serif';
+      ctx.fillText('💞', x+28, y-22);
+      ctx.restore();
+    }
+  };
+
+  function drawPerson(px, py, suit, accent, isBride, ducking){
+    ctx.save();
+    const k = ducking ? 0.85 : 1.0;
+    ctx.fillStyle = '#f1c27d'; ctx.beginPath(); ctx.arc(px, py, 9*k, 0, Math.PI*2); ctx.fill();
+    if(isBride){
+      ctx.fillStyle = '#7c3aed'; ctx.fillRect(px-10, py-9, 20*k, 8*k);
+      ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.beginPath(); ctx.ellipse(px-4, py+8, 14*k, 10*k, -0.3, 0, Math.PI*2); ctx.fill();
+    }else{
+      ctx.fillStyle = '#374151'; ctx.beginPath(); ctx.arc(px, py-2, 10*k, Math.PI, 0); ctx.fill();
+      ctx.fillStyle = accent; ctx.fillRect(px-7, py+6, 14*k, 4*k);
+    }
+    ctx.fillStyle = suit; ctx.fillRect(px-10, py+10, 20*k, 24*k);
+    ctx.fillStyle = suit; ctx.fillRect(px+(isBride?8:-12), py+12, (isBride?10:-10)*k, 4*k);
+    ctx.fillRect(px-9, py+34, 7*k, 16*k); ctx.fillRect(px+2, py+34, 7*k, 16*k);
+    if(isBride){
+      ctx.fillStyle = accent;
+      ctx.beginPath(); ctx.moveTo(px-10, py+34); ctx.lineTo(px+10, py+34); ctx.lineTo(px+16, py+48); ctx.lineTo(px-16, py+48);
+      ctx.closePath(); ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  const obstacles = [];
+  const types = [
+    {emoji:'🤬', w:30, h:30, y: groundY},
+    {emoji:'🐍', w:26, h:26, y: groundY-40},
+    {emoji:'🍻', w:34, h:34, y: groundY},
+    {emoji:'💔', w:26, h:26, y: groundY-40}
+  ];
+
+  let nextSpawnAt = 0;
+  const baseGapPx = 220;
+  const gapScale = 14;
+
+  function minGap(){ return Math.round(baseGapPx + gapScale * speed); }
+
+  function canSpawn(){
+    if(obstacles.length === 0) return true;
+    const last = obstacles[obstacles.length-1];
+    return (canvas.width - last.x) >= minGap();
+  }
+
+  function spawn(now){
+    if(now < nextSpawnAt) return;
+    if(!canSpawn()) { nextSpawnAt = now + 300; return; }
+    const r = Math.random();
+    const type = r < 0.55 ? types[0] : (r < 0.85 ? types[2] : types[1]);
+    obstacles.push({ x: canvas.width + 20, y: type.y, w: type.w, h: type.h, emoji: type.emoji });
+    const timePerPx = 1000 / (60 * speed);
+    const gap = minGap() + Math.random()*120;
+    nextSpawnAt = now + gap * timePerPx;
+  }
+
+  document.addEventListener('keydown', (e)=>{
+    const now = performance.now();
+    if(e.code === 'Space' || e.code === 'ArrowUp'){ e.preventDefault(); lastJumpPressTime = now; player.jump(now); }
+    if(e.code === 'ArrowDown'){ player.setDuck(true); }
+    if(gameOver && e.code === 'Enter') restart();
+  });
+  document.addEventListener('keyup', (e)=>{
+    if(e.code === 'ArrowDown'){ player.setDuck(false); }
+  });
+
+  jumpBtn.addEventListener('click', ()=> { lastJumpPressTime = performance.now(); player.jump(performance.now()); });
+  jumpBtn.addEventListener('touchstart', (e)=>{ e.preventDefault(); lastJumpPressTime = performance.now(); player.jump(performance.now()); }, {passive:false});
+
+  duckBtn.addEventListener('mousedown', ()=> player.setDuck(true));
+  duckBtn.addEventListener('mouseup', ()=> player.setDuck(false));
+  duckBtn.addEventListener('touchstart', (e)=>{ e.preventDefault(); player.setDuck(true); }, {passive:false});
+  duckBtn.addEventListener('touchend', (e)=>{ e.preventDefault(); player.setDuck(false); }, {passive:false});
+
+  restartBtn.addEventListener('click', restart);
+
+  function collide(a, b){
+    return a.x < b.x + b.w && a.x + a.w > b.x && a.y - a.h < b.y && a.y > b.y - b.h;
+  }
+
+  let last = performance.now();
+  function loop(now){
+    if(gameOver) return;
+    const dt = Math.min(40, now - last) / 16.67; last = now; t += dt;
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.strokeStyle = '#f9c'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0, groundY+20); ctx.lineTo(canvas.width, groundY+20); ctx.stroke();
+
+    player.update(dt, now);
+    spawn(now);
+
+    for(let i=obstacles.length-1;i>=0;i--){
+      const o = obstacles[i];
+      o.x -= speed;
+      ctx.font = '28px Segoe UI Emoji, Apple Color Emoji, sans-serif';
+      ctx.fillText(o.emoji, o.x, o.y);
+
+      const ph = player.h * (player.ducking ? 0.7 : 1.0);
+      if(collide({x:player.x, y:player.y, w:player.w, h:ph}, {x:o.x, y:o.y, w:o.w, h:o.h})){
+        return endGame();
+      }
+      if(o.x + o.w < 0) obstacles.splice(i,1);
+    }
+
+    score += Math.floor(1 * dt);
+    if(score > 0 && score % 300 === 0) speed = Math.min(9, speed + 0.4);
+    scoreEl.textContent = score;
+    speedEl.textContent = (speed/6).toFixed(1)+'x';
+
+    requestAnimationFrame(loop);
+  }
+
+  function endGame(){
+    gameOver = true;
+    finalScoreEl.textContent = score;
+
+    /* ⭐⭐⭐ ACTUALIZAR EL RÉCORD ⭐⭐⭐ */
+
+    if(score > highScore){
+      highScore = score;
+      localStorage.setItem("highScore", highScore);
+      highScoreEl.textContent = highScore;
+      recordText.textContent = "🎉 ¡Nuevo récord! " + highScore + " puntos";
+    } else {
+      recordText.textContent = "Récord actual: " + highScore;
+    }
+
+    overlay.style.display = 'flex';
+  }
+
+  function restart(){
+    gameOver = false;
+    obstacles.length = 0;
+    speed = 6; score = 0; t = 0;
+    nextSpawnAt = performance.now() + 800;
+    player.y = groundY; player.vy = 0; player.jumping = false; player.ducking = false;
+    overlay.style.display = 'none';
+    fitCanvas();
+    last = performance.now();
+    requestAnimationFrame(loop);
+  }
+
+  nextSpawnAt = performance.now() + 800;
+  requestAnimationFrame(loop);
+
+})();
+</script>
+</body>
+</html>

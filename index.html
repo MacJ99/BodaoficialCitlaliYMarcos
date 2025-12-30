@@ -1,0 +1,880 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Nuestra boda | Citlali & Marcos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <!-- Iconos -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    :root{
+      --primary:#e91e63;
+      --secondary:#7c4dff;
+      --dark:#1a1a1a;
+      --light:#ffffff;
+      --glass-bg:rgba(255,255,255,0.15);
+      --glass-border:rgba(255,255,255,0.25);
+    }
+
+    /* Tipografía y base */
+    body{
+      font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color:#333;
+      background: radial-gradient(1200px 600px at 20% 10%, #ffe1ec 0%, #fff6fa 30%, #ffffff 65%) fixed;
+      overflow-x:hidden;
+    }
+    h1,h2,h3{
+      letter-spacing:0.5px;
+    }
+    .text-gradient{
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    /* Navbar */
+    .navbar{
+      backdrop-filter: saturate(150%) blur(8px);
+      background: rgba(255,255,255,0.7);
+      border-bottom: 1px solid #eee;
+    }
+    .nav-link{
+      font-weight:600;
+    }
+    .nav-link.active{
+      color: var(--primary)!important;
+    }
+
+    /* Hero con parallax */
+    .hero{
+      position:relative;
+      min-height: 85vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      color:#fff;
+      overflow:hidden;
+    }
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background-image: url("a1.jpg");
+      background-size:cover;
+      background-position:center;
+      transform:translateZ(0);
+      filter:contrast(1.05) saturate(1.1);
+    }
+    .hero::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(to bottom, rgba(0,0,0,0.35), rgba(0,0,0,0.55));
+    }
+    .hero-content{
+      position:relative;
+      z-index:2;
+      max-width:1000px;
+      padding:2rem;
+      animation:fadeInUp 1s ease both;
+    }
+    @keyframes fadeInUp{
+      from{opacity:0; transform: translateY(20px);}
+      to{opacity:1; transform: translateY(0);}
+    }
+
+    /* Chips fecha y lugar */
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:.5rem;
+      padding:.5rem 1rem;
+      border-radius:999px;
+      background: rgba(255,255,255,0.15);
+      border:1px solid rgba(255,255,255,0.3);
+      backdrop-filter: blur(6px);
+      color:#fff;
+      margin:.25rem;
+    }
+
+    /* Secciones */
+    section{
+      padding: 80px 0;
+    }
+    .section-title{
+      display:flex;
+      align-items:center;
+      gap:.75rem;
+      margin-bottom:1.5rem;
+    }
+    .section-title .bar{
+      width:36px; height:4px; border-radius:999px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+    }
+
+    /* Tarjetas glass */
+    .glass{
+      background: var(--glass-bg);
+      border:1px solid var(--glass-border);
+      backdrop-filter: blur(10px);
+      border-radius:16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+
+    /* Curiosidades y sabías que */
+    .fact{
+      padding:1.25rem;
+      border-radius:12px;
+      background: #fff;
+      border:1px dashed #ffd6e6;
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .fact:hover{
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(233,30,99,0.15);
+    }
+
+    /* Timeline */
+    .timeline{
+      position:relative;
+      padding-left:2rem;
+    }
+    .timeline::before{
+      content:"";
+      position:absolute;
+      left:14px; top:0; bottom:0;
+      width:4px; border-radius:999px;
+      background: linear-gradient(to bottom, var(--primary), var(--secondary));
+    }
+    .timeline-item{
+      position:relative;
+      margin-bottom:1.5rem;
+    }
+    .timeline-item::before{
+      content:"";
+      position:absolute;
+      left:-2px; top:.25rem;
+      width:16px; height:16px; border-radius:50%;
+      border:3px solid #fff;
+      box-shadow:0 0 0 4px rgba(233,30,99,0.25);
+      background: var(--primary);
+    }
+
+    /* Galería */
+    .gallery img{
+      width:100%; height:240px; object-fit:cover;
+      border-radius:14px;
+      transition: transform .3s ease, box-shadow .3s ease, filter .3s ease;
+    }
+    .gallery a{
+      display:block; position:relative;
+      overflow:hidden; border-radius:14px;
+    }
+    .gallery a::after{
+      content:"";
+      position:absolute; inset:0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0) 40%, rgba(0,0,0,0.35));
+      opacity:0; transition:.3s;
+    }
+    .gallery a:hover img{
+      transform: scale(1.04);
+      filter: saturate(1.1) contrast(1.05);
+    }
+    .gallery a:hover::after{ opacity:1; }
+
+    /* Mapa y misa tarjetas */
+    .map-card, .mass-card{
+      overflow:hidden;
+    }
+    .map-card iframe{
+      border:0; width:100%; height:300px;
+      filter: saturate(1.1) contrast(1.05);
+      border-radius:12px;
+    }
+
+    /* Quiz Él o Ella */
+    .quiz-card .option{
+      border:1px solid #eee;
+      border-radius:12px; padding:.75rem 1rem;
+      background:#fff;
+      cursor:pointer; user-select:none;
+      transition:.2s;
+    }
+    .quiz-card .option:hover{
+      border-color:#ffc4d8; box-shadow:0 4px 12px rgba(233,30,99,0.12);
+    }
+    .quiz-card .option input{ display:none; }
+    .quiz-card .option.active{
+      border-color: var(--primary);
+      box-shadow:0 0 0 4px rgba(233,30,99,0.15);
+    }
+
+    /* CTA Confirmar asistencia */
+    .cta{
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      color:#fff; border:none; border-radius:12px;
+      padding:1rem 1.5rem; font-weight:700;
+      box-shadow: 0 10px 30px rgba(124,77,255,0.25);
+      transition:.2s;
+    }
+    .cta:hover{ transform: translateY(-2px); }
+
+    /* Footer */
+    footer{
+      background:#111; color:#eee;
+      padding:40px 0;
+    }
+
+    /* Utilidades */
+    .bg-soft{
+      background: linear-gradient(180deg, #fff 0%, #fff6fa 60%, #fff 100%);
+    }
+    .badge-soft{
+      background:#fff; border:1px solid #ffe1ec; color:#e91e63;
+      border-radius:999px; padding:.35rem .75rem; font-weight:600;
+    }
+
+    /* Scroll reveal sencillo */
+    .reveal{ opacity:0; transform: translateY(20px); transition: .6s ease; }
+    .reveal.visible{ opacity:1; transform:none; }
+  </style>
+</head>
+<body data-bs-spy="scroll" data-bs-target="#nav" data-bs-offset="80" tabindex="0">
+
+  <!-- Navbar -->
+  <nav id="nav" class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold text-gradient" href="#">Citlali & Marcos</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div id="navContent" class="collapse navbar-collapse">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="#historia">Historia</a></li>
+          <li class="nav-item"><a class="nav-link" href="#curiosidades">Curiosidades</a></li>
+          <li class="nav-item"><a class="nav-link" href="#programa">Programa</a></li>
+          <li class="nav-item"><a class="nav-link" href="#agradecimientos">Agradecimientos</a></li>
+          <li class="nav-item"><a class="nav-link" href="#quiz">Preguntas</a></li>
+          <li class="nav-item"><a class="nav-link" href="#sabias">Sabías que</a></li>
+          <li class="nav-item"><a class="nav-link" href="#galeria">Galería</a></li>
+          <li class="nav-item"><a class="nav-link" href="#lugar">Lugar</a></li>
+          <li class="nav-item"><a class="nav-link" href="#misa">La misa</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-content">
+      <span class="chip"><i class="fa-solid fa-calendar-day"></i> 25 de julio, 2026</span>
+      <span class="chip"><i class="fa-solid fa-location-dot"></i> Zitácuaro Mich.</span>
+      <h1 class="display-4 fw-bold mt-3">Nuestro sí para siempre</h1>
+      <p class="lead">Cada paso nos trajo aquí. Hoy celebramos el amor, la fe, la familia y las historias que nos hicieron uno.</p>
+      <div class="mt-4">
+        <a class="btn btn-light fw-bold me-2" href="#programa"><i class="fa-solid fa-heart"></i> Ver programa</a>
+        <a class="btn cta" href="#contacto"><i class="fa-brands fa-whatsapp"></i> Confirmar asistencia</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Historia de amor -->
+  <section id="historia" class="bg-soft">
+    <div class="container">
+      <div class="section-title">
+        <div class="bar"></div>
+        <h2 class="mb-0 text-center">Historia de amor</h2>
+      </div>
+      <div class="row g-4 align-items-center">
+        <div class="col-md-6 reveal">
+          <div class="glass p-4">
+            <h3 class="text-gradient mb-3 text-center">De casualidad a destino</h3>
+            <p>Citlali y Marcos se conocieron en un retiro del grupo Arcoíris en la parroquia de San Juan
+Bautista, donde nació una conexión sincera y espiritual. Durante ocho meses cultivaron una
+profunda amistad hasta que, el 12 de mayo de 2019, se hicieron novios durante una velada
+especial en la que Citlali, entre nervios y ternura, le preparó a Marcos una torta dura y
+quemada que él recibió con una sonrisa inolvidable.</p>
+            <p>Su relación floreció entre actividades del grupo, salidas llenas de risas y momentos únicos,
+como cuando Marcos quedaba fascinado al verla bailar danza árabe. Sin embargo, en 2020
+enfrentaron su primera gran prueba: Citlali se mudó a Cuitzeo por motivos familiares y la
+pandemia los obligó a mantener su amor a distancia. Apesar de las dificultades, siguieron en
+contacto constante, y Marcos logró visitarla varias veces, fortaleciéndose aún más.</p>
+<p>En diciembre de ese mismo año, Citlali regresó a Zitácuaro pero aún debían verse con
+discreción. Con el apoyo amoroso de su abuela paterna, quien los acompañaba a misa y les
+brindaba momentos para compartir, su relación continuó creciendo en silencio y con respeto.
+En 2023, Marcos decidió hablarcon el padre de Citlali, expresando su amor con honestidad y
+madurez, logrando finalmente su aprobación. Desde entonces, vivieron su relación con
+libertad y alegría. El 31 de enero de 2025, Marcos le propuso matrimonio, y Citlali aceptó con
+emoción.</p>
+            
+          </div>
+        </div>
+        <div class="col-md-6 reveal">
+          <h3 class="text-gradient mb-3 text-center">Primer foto en 2018</h3>
+          <img class="w-100 rounded-4 shadow" src="2.jpg" alt="Pareja feliz">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <h3 class="text-gradient mb-3 text-center">Comparte con nostros la invitación de los niños</h3>
+    <h3 class="mb-3 text-center">📖🤩</h3>
+    <div class="mt-4 text-center">
+      
+        <a class="btn cta" href="compartir.html"><i class="fa-solid fa-book"></i> Compartir</a>
+      </div>
+  </div>
+  <!-- Curiosidades -->
+  <section id="curiosidades">
+    <div class="container">
+      <div class="section-title">
+        <div class="bar"></div>
+        <h2 class="mb-0">Curiosidades</h2>
+      </div>
+
+
+
+      <div class="row g-3">
+        <div class="col-md-4 reveal">
+          <div class="fact">
+            <h5><i class="fa-solid fa-music text-gradient"></i> La pastorela</h5>
+            <p>En la pastorela, no vio a una personaje vio a la mujer de su vida</p>
+          </div>
+        </div>
+        <div class="col-md-4 reveal">
+          <div class="fact">
+            <h5><i class="fa-solid fa-heart text-gradient"></i> San Gabriel</h5>
+            <p>La maleta de San Gabriel, era su
+esquina sagrada donde el amor
+tenía sabor a latte
+</p>
+          </div>
+        </div>
+        <div class="col-md-4 reveal">
+          <div class="fact">
+            <h5><i class="fa-solid fa-heart-circle-check text-gradient"></i> Chambelan a Esposo</h5>
+            <p>Fue chambelán de sus XV primaveras,  
+hoy su destino: amarla por eras. </p>
+          </div>
+        </div>
+      </div>
+      <p></p>
+     <div class="row g-3">
+        <div class="col-md-4 reveal">
+          <div class="fact">
+            
+            <h5><i class="fa-solid fa-people-pulling text-gradient"></i> Parejas de baile</h5>
+            <p>En las pistas no habían
+coreografías, solo sincronía
+de sus almas</p>
+          </div>
+        </div>
+        <div class="col-md-4 reveal">
+          <div class="fact">
+            <h5><i class="fa-solid fa-brands fa-gulp text-gradient"></i> Las botanas</h5>
+            <p>Las papas picosas
+encendieron algo que ni
+las SKYs pudieron apagar
+</p>
+          </div>
+        </div>
+        <div class="col-md-4 reveal">
+          <div class="fact">
+            <h5><i class="fa-solid fa-cross text-gradient"></i> Su Fé</h5>
+            <p>Dios fue y es el lazo invisible y que
+los mantuvo y mantiene unidos
+ </p>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </section>
+
+  <!-- Programa del evento -->
+  <section id="programa" class="bg-soft">
+    <div class="container">
+      <div class="section-title">
+        <div class="bar"></div>
+        <h2 class="mb-0">Programa del evento</h2>
+      </div>
+
+
+      <div class="row">
+        <div class="col-lg-8 mx-auto reveal">
+          <div class="glass p-4">
+            <div class="timeline">
+              <div class="timeline-item">
+                <h5 class="mb-1"> <br>12:40 — Misa</h5>
+                <p class="text-muted mb-0">Ceremonia eucarística
+de fe y agradecimiento
+</p>
+              </div>
+              <div class="timeline-item">
+                <h5 class="mb-1"><br>15:00 — Recepción</h5>
+                <p class="text-muted mb-0">Recepción en el salón
+“Salones Victoria” Puente
+San Juan Viejo, Zitácuaro
+Mich. NO OLVIDES
+LLEVAR EL PASE
+</p>
+              </div>
+              <div class="timeline-item">
+                <h5 class="mb-1"><br>15:10 — Entrada de los Novios</h5>
+                <p class="text-muted mb-0">“Un instante mágico donde inicia su camino juntos.”</p>
+              </div>
+              <div class="timeline-item">
+                <h5 class="mb-1"><br>15:20 — Banquete</h5>
+                <p class="text-muted mb-0">“Un festín preparado para deleitar cada momento.”</p>
+              </div>
+              <div class="timeline-item">
+                <h5 class="mb-1"><br>16:00 — Primer baile (vals)</h5>
+                <p class="text-muted mb-0">“Un vals que marca el inicio de su historia juntos.”</p>
+              </div>
+              <div class="timeline-item">
+                <h5 class="mb-1"><br>17:00 — Baile y fiesta</h5>
+                <p class="text-muted mb-0">DJ, sorpresas y pista toda la noche.</p>
+              </div>
+              <div class="timeline-item">
+                <h5 class="mb-1"><br>23:30 — Pastel y bendiciones</h5>
+                <p class="text-muted mb-0">Cierre con gratitud.</p>
+              </div>
+            </div>
+            <div class="mt-3 text-center">
+            <a href="juego.html" style="text-decoration: none;"> 
+              <span class="badge-soft"><i class="fa-solid fa-dice "></i> Juegos</span> </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Agradecimientos -->
+  <section id="agradecimientos">
+    <div class="container">
+      <div class="section-title">
+        <div class="bar"></div>
+        <h2 class="mb-0">Agradecimientos especiales</h2>
+      </div>
+      <div class="row g-4">
+        <!-- Dios -->
+        <div class="col-md-4 reveal">
+          <div class="glass p-4 h-100">
+            <h4 class="text-gradient"><i class="fa-solid fa-cross"></i> Dios</h4>
+            <p>Gracias por guiarnos con fe, por la paciencia en el camino y por cada puerta abierta. Que este amor sea servicio y luz.</p>
+          </div>
+        </div>
+        <!-- Papás -->
+        <div class="col-md-4 reveal">
+          <div class="glass p-4 h-100">
+            <h4 class="text-gradient"><i class="fa-solid fa-people-roof"></i> Los papás</h4>
+            <p>Por enseñarnos a amar con verdad, a construir con trabajo y a celebrar con gratitud. Todo esto también es suyo.</p>
+          </div>
+        </div>
+        <!-- Padrinos -->
+        <div class="col-md-4 reveal">
+          <div class="glass p-4 h-100">
+            <h4 class="text-gradient"><i class="fa-solid fa-hand-holding-heart"></i> Los padrinos</h4>
+            <p>Gracias por caminar cerca, por los consejos y por la fe compartida. Su abrazo nos sostiene.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quiz: Adivina quién lo dijo -->
+  <section id="quiz" class="bg-soft">
+    <div class="container">
+      <div class="section-title">
+        <div class="bar"></div>
+        <h2 class="mb-0">Adivina quién lo dijo: ¿Él o Ella?</h2>
+      </div>
+      <div class="row">
+        <div class="col-lg-10 mx-auto reveal">
+          <div class="glass p-4 quiz-card">
+            <p class="mb-3">Elige quién dijo cada frase. Al final verás tu puntaje. ¿Cuánto conoces su historia?</p>
+            <form id="quizForm">
+              <div class="row g-3">
+                <!-- 9 preguntas -->
+                <div class="col-md-6">
+                  <label class="fw-bold mb-2">1) ¿Quién dijo Te amo primero?</label>
+                  <div class="d-flex gap-2">
+                    <label class="option flex-fill"><input type="radio" name="q1" value="EL"> Él</label>
+                    <label class="option flex-fill"><input type="radio" name="q1" value="ELLA"> Ella</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="fw-bold mb-2">2) ¿Quién mando el primer mensaje?</label>
+                  <div class="d-flex gap-2">
+                    <label class="option flex-fill"><input type="radio" name="q2" value="EL"> Él</label>
+                    <label class="option flex-fill"><input type="radio" name="q2" value="ELLA"> Ella</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="fw-bold mb-2">3) ¿Quién dio el primer beso ?</label>
+                  <div class="d-flex gap-2">
+                    <label class="option flex-fill"><input type="radio" name="q3" value="EL"> Él</label>
+                    <label class="option flex-fill"><input type="radio" name="q3" value="ELLA"> Ella</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="fw-bold mb-2">4) ¿Quién propuso la primera cita?</label>
+                  <div class="d-flex gap-2">
+                    <label class="option flex-fill"><input type="radio" name="q4" value="EL"> Él</label>
+                    <label class="option flex-fill"><input type="radio" name="q4" value="ELLA"> Ella</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="fw-bold mb-2">5) ¿Quién es más detallista?</label>
+                  <div class="d-flex gap-2">
+                    <label class="option flex-fill"><input type="radio" name="q5" value="EL"> Él</label>
+                    <label class="option flex-fill"><input type="radio" name="q5" value="ELLA"> Ella</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="fw-bold mb-2">6) ¿Quién habla más en la relación?</label>
+                  <div class="d-flex gap-2">
+                    <label class="option flex-fill"><input type="radio" name="q6" value="EL"> Él</label>
+                    <label class="option flex-fill"><input type="radio" name="q6" value="ELLA"> Ella</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="fw-bold mb-2">7) ¿Quién es más organizado?</label>
+                  <div class="d-flex gap-2">
+                    <label class="option flex-fill"><input type="radio" name="q7" value="EL"> Él</label>
+                    <label class="option flex-fill"><input type="radio" name="q7" value="ELLA"> Ella</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="fw-bold mb-2">8) ¿Quién es más bromista?</label>
+                  <div class="d-flex gap-2">
+                    <label class="option flex-fill"><input type="radio" name="q8" value="EL"> Él</label>
+                    <label class="option flex-fill"><input type="radio" name="q8" value="ELLA"> Ella</label>
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <label class="fw-bold mb-2">9) ¿Quién es más paciente?</label>
+                  <div class="d-flex gap-2">
+                    <label class="option flex-fill"><input type="radio" name="q9" value="EL"> Él</label>
+                    <label class="option flex-fill"><input type="radio" name="q9" value="ELLA"> Ella</label>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex align-items-center gap-3 mt-4">
+                <button type="button" class="btn btn-outline-dark fw-bold" id="checkQuiz">
+                  <i class="fa-solid fa-check"></i> Calcular puntaje
+                </button>
+                <span id="quizResult" class="fw-bold"></span>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sabías que -->
+  <section id="sabias">
+    <div class="container">
+      <div class="section-title">
+        <div class="bar"></div>
+        <h2 class="mb-0">Sabías que…</h2>
+      </div>
+
+
+      <div class="row g-3">
+        <div class="col-md-6 reveal">
+          <div class="fact">
+            <h5><i class="fa-solid fa-ring text-gradient"></i> La propuesta</h5>
+            <p>Marcos le pidió matrimonio a Citlali el 31 de
+enero de 2025. Un día que quedó tatuado en sus
+corazones.
+</p>
+          </div>
+        </div>
+        <div class="col-md-6 reveal">
+          <div class="fact">
+            <h5><i class="fa-solid fa-music text-gradient"></i> Canción</h5>
+            <p>La canción “En mi pancita” sonó durante la
+propuesta. Es el tema favorito de Citlali, lleno
+de recuerdos de pequeña con su mamá y de
+grande con Marcos</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-6 reveal">
+          <div class="fact">
+            <h5><i class="fa-solid fa-compact-disc text-gradient"></i> Baile</h5>
+            <p>El zapateado es su baile favorito. ¡Así celebran
+el amor, con ritmo y alegría que retumba en el
+alma!
+</p>
+          </div>
+        </div>
+        <div class="col-md-6 reveal">
+          <div class="fact">
+            <h5><i class="fa-solid fa-fan text-gradient"></i>Flor</h5>
+            <p>Los girasoles son la esencia de esta boda. Fue la
+primera flor que Marcos le regaló a Citlali.
+Desde entonces, son su símbolo de amor.
+</p>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </section>
+
+  <!-- Galería -->
+  <section id="galeria" class="bg-soft">
+    <div class="container">
+      <div class="section-title">
+        <div class="bar"></div>
+        <h2 class="mb-0">Galería</h2>
+      </div>
+
+      <div class="row g-3 gallery">
+        <div class="col-md-4 reveal">
+          <a href="a1.jpg" target="_blank" rel="noopener">
+            <img src="a1.jpg" alt="Momentos 1">
+          </a>
+        </div>
+        <div class="col-md-4 reveal">
+          <a href="a2.jpg" target="_blank" rel="noopener">
+            <img src="a2.jpg" alt="Momentos 2">
+          </a>
+        </div>
+        <div class="col-md-4 reveal">
+          <a href="a3.jpg" target="_blank" rel="noopener">
+            <img src="a3.jpg" alt="Momentos 3">
+          </a>
+        </div>
+      </div>
+      <p></p>
+<div class="row g-3 gallery">
+        <div class="col-md-4 reveal">
+          <a href="a4.jpg" target="_blank" rel="noopener">
+            <img src="a4.jpg" alt="Momentos 1">
+          </a>
+        </div>
+        <div class="col-md-4 reveal">
+          <a href="a5.jpg" target="_blank" rel="noopener">
+            <img src="a5.jpg" alt="Momentos 2">
+          </a>
+        </div>
+        <div class="col-md-4 reveal">
+          <a href="a6.jpg" target="_blank" rel="noopener">
+            <img src="a6.jpg" alt="Momentos 3">
+          </a>
+        </div>
+      </div>
+
+    </div>
+    
+  </section>
+
+  <!-- Lugar del evento -->
+  <section id="lugar">
+    <div class="container">
+      <div class="section-title">
+        <div class="bar"></div>
+        <h2 class="mb-0">Lugar del evento</h2>
+      </div>
+      <div class="row g-4">
+        <div class="col-lg-6 reveal">
+          <div class="glass p-4 map-card">
+            <h4 class="mb-2"><i class="fa-solid fa-location-dot text-gradient"></i> Salon Victoria</h4>
+            <p class="mb-3">Loma Larga/ Zitácuaro Mich.</p>
+            <iframe 
+  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3762.123456789!2d-100.3515518!3d19.460014!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d2a4aaeea71065%3A0xc2e5ca9bb0b26bb6!2sSalones%20Victoria%20Zitacuaro!5e0!3m2!1ses!2smx!4v1700000000000!5m2!1ses!2smx" 
+  width="600" 
+  height="450" 
+  style="border:0;" 
+  allowfullscreen="" 
+  loading="lazy" 
+  referrerpolicy="no-referrer-when-downgrade">
+</iframe>
+          </div>
+        </div>
+        <div class="col-lg-6 reveal">
+          <img class="w-100 rounded-4 shadow" src="sal.jpeg" alt="Lugar del evento">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- La misa -->
+  <section id="misa" class="bg-soft">
+    <div class="container">
+      <div class="section-title">
+        <div class="bar"></div>
+        <h2 class="mb-0">Acción de gracias (Misa)</h2>
+      </div>
+      <div class="row g-4">
+        <div class="col-lg-8 mx-auto reveal">
+          <div class="glass p-4 mass-card">
+            <h4 class="mb-2"><i class="fa-solid fa-church text-gradient"></i> Parroquia de Nuestra señora de Guadalupe </h4>
+            <p>Hora: 12:40 | Dirección: Lazaro Cardenas Sur 67, Las Palmas, 61516 Zitácuaro, Mich.</p>
+            <p>Te pedimos llegar con 15 minutos de anticipación. Gracias por acompañarnos en este momento de fe.</p>
+            <img class="w-100 rounded-4 shadow" src="misa.png" alt="Iglesia">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contacto y confirmación -->
+  <section id="contacto">
+    <div class="container">
+      <div class="section-title">
+        <div class="bar"></div>
+        <h2 class="mb-0">Contacto</h2>
+      </div>
+      <div class="row g-4 align-items-center">
+        
+        <div class="col-lg-6 reveal">
+          <div class="glass p-4">
+            <h4 class="text-gradient mb-3">
+              <i class="fa-brands fa-whatsapp"></i> Confirmar asistencia
+            </h4>
+            <p>Tu mensaje nos hace felices. Confirma por WhatsApp</p>
+            <div class="d-flex gap-2">
+              <input id="guestName" class="form-control" type="text" placeholder="Tu nombre">
+              <button class="cta" id="confirmBtn">
+                <i class="fa-brands fa-whatsapp"></i> Confirmar
+              </button>
+            </div>
+            <small class="text-muted d-block mt-2">
+              Se abrirá WhatsApp con tu confirmación al número +52 715 108 5441.
+            </small>
+          </div>
+        </div>
+
+        <!-- NUEVO BLOQUE DONACIÓN -->
+        <div class="col-lg-6 reveal">
+  <div class="glass p-4">
+    <h4 class="text-gradient mb-3">
+      <i class="fa-solid fa-gift"></i> Apoyo a nuestra boda
+    </h4>
+    <p>
+      Su presencia es nuestro mejor regalo.  
+      Si desean apoyarnos en nuestra boda, se los agradeceremos de corazón.
+    </p>
+    <div class="d-flex gap-2">
+      <input id="donorName" class="form-control" type="text" placeholder="Tu nombre (opcional)">
+      <button class="cta" onclick="donarWhatsapp()">
+        <i class="fa-solid fa-heart"></i> Donar
+      </button>
+    </div>
+    <small class="text-muted d-block mt-2">
+      Transferencia o apoyo especial para nuestro nuevo comienzo juntos.
+    </small>
+  </div>
+</div>
+
+<script>
+  function donarWhatsapp() {
+    const nombre = document.getElementById("donorName").value || "Anónimo";
+    const mensaje = `Hola, soy ${nombre} 😊. Me gustaría apoyar con una donación para su boda 💍✨`;
+    const telefono = "527151085441";
+    const url = `https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`;
+    window.open(url, "_blank");
+  }
+</script>
+
+        
+      </div>
+    </div>
+  </section>
+
+
+  
+  
+  <!-- Footer -->
+  <footer>
+    <div class="container text-center">
+      <p class="mb-2">Con amor, familia y amigos — Gracias por ser parte.</p>
+      <small class="text-secondary">© Citlali & Marcos</small>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Scroll reveal básico
+    const onScrollReveal = () => {
+      document.querySelectorAll('.reveal').forEach(el => {
+        const rect = el.getBoundingClientRect();
+        if(rect.top < window.innerHeight - 80) el.classList.add('visible');
+      });
+    };
+    window.addEventListener('scroll', onScrollReveal);
+    window.addEventListener('load', onScrollReveal);
+
+    // Activar estilo en opciones del quiz
+    document.querySelectorAll('.quiz-card .option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        const name = opt.querySelector('input').name;
+        document.querySelectorAll(`input[name="${name}"]`).forEach(i => {
+          const parent = i.closest('.option');
+          parent.classList.remove('active');
+        });
+        opt.classList.add('active');
+        opt.querySelector('input').checked = true;
+      });
+    });
+
+    // Respuestas correctas del quiz (puedes ajustar libremente)
+    const correct = {
+      q1: 'EL',
+      q2: 'ELLA',
+      q3: 'EL',
+      q4: 'ELLA',
+      q5: 'EL',
+      q6: 'ELLA',
+      q7: 'EL',
+      q8: 'EL',
+      q9: 'EL'
+    };
+
+    document.getElementById('checkQuiz').addEventListener('click', () => {
+      let score = 0, total = 9, answered = 0;
+      Object.keys(correct).forEach(q => {
+        const checked = document.querySelector(`input[name="${q}"]:checked`);
+        if(checked){
+          answered++;
+          if(checked.value === correct[q]) score++;
+        }
+      });
+      const msg = answered < total
+        ? `Has respondido ${answered}/${total}.`
+        : `¡Tu puntaje: ${score}/${total}!`;
+      document.getElementById('quizResult').textContent = msg;
+    });
+
+    // Confirmación por WhatsApp
+    document.getElementById('confirmBtn').addEventListener('click', () => {
+      const name = document.getElementById('guestName').value.trim();
+      const text = encodeURIComponent(
+        name
+          ? `Hola, soy ${name}. Confirmo mi asistencia a la boda. 💒`
+          : `Hola, confirmo mi asistencia a la boda. 💒`
+      );
+      const url = `https://wa.me/527151085441?text=${text}`;
+      window.open(url, '_blank');
+    });
+  </script>
+</body>
+</html>
